@@ -21,12 +21,19 @@ public:
 		if (debug) printf("%s Robot::Push->%d, button:%d, order:%d\n", name, number_of_buttons-1, button, order);
 	}
 
-	bool Pop()
+	int Pop()
 	{
 		if (debug) printf("%s Robot::Pop->Push button:%d (at index:%d/%d)\n", 
 			name, target_buttons[current_index].target, current_index, number_of_buttons);
-		current_index++;
-		return (current_index == number_of_buttons);
+		if (number_of_buttons)
+		{
+			current_index++;
+			return (current_index == number_of_buttons);
+		}
+		else
+		{
+			return -1;
+		}
 	}
 
 	int Move()
@@ -61,7 +68,7 @@ public:
 		for (int i=0; i<100; i++)
 		{
 			target_buttons[i].order = 0;
-			target_buttons[i].target = 0;
+			target_buttons[i].target = 1;
 		}
 	}
 
@@ -139,13 +146,24 @@ int main(void)
 			
 			if (ready0 == order)
 			{
-				waiting0 = Robots[0].Pop();
-				inc=true;
+				int r = Robots[0].Pop();
+				if (r > -1) {
+					inc=true;
+				}
+				if (r != 0) {
+					waiting0 = true;
+				}
 			}
 			if (ready1 == order) 
 			{
-				waiting1 = Robots[1].Pop();
-				inc=true;
+				int r = Robots[1].Pop();
+				if (r > -1)
+				{
+					inc=true;
+				}
+				if (r != 0) {
+					waiting1 = true;
+				}
 			}
 			if (inc)
 			{
