@@ -1,4 +1,5 @@
 #include <stdio.h>
+bool debug = false;
 
 class Robot
 {
@@ -17,12 +18,13 @@ public:
 	{
 		target_buttons[number_of_buttons].target = button;
 		target_buttons[number_of_buttons++].order = order;
-		//printf("%s Robot::Push->%d, button:%d, order:%d\n", name, number_of_buttons-1, button, order);
+		if (debug) printf("%s Robot::Push->%d, button:%d, order:%d\n", name, number_of_buttons-1, button, order);
 	}
 
 	bool Pop()
 	{
-		printf("%s Robot::Pop->Push button:%d (at index:%d)\n", name, target_buttons[current_index].target, current_index);
+		if (debug) printf("%s Robot::Pop->Push button:%d (at index:%d/%d)\n", 
+			name, target_buttons[current_index].target, current_index, number_of_buttons);
 		current_index++;
 		return (current_index == number_of_buttons);
 	}
@@ -32,20 +34,20 @@ public:
 		if (current_button < target_buttons[current_index].target)
 		{
 			current_button++;
-			printf("%s Robot::Move up to button %d (target:%d)\n", 
+			if (debug) printf("%s Robot::Move up to button %d (target:%d)\n", 
 				name, current_button, target_buttons[current_index-1].target);
 			return -1;
 		}
 		else if (current_button > target_buttons[current_index].target)
 		{
 			current_button--;
-			printf("%s Robot::Move down to button %d (target:%d)\n", 
+			if (debug) printf("%s Robot::Move down to button %d (target:%d)\n", 
 				name, current_button, target_buttons[current_index-1].target);
 			return -1;
 		}
 		else
 		{
-			printf("%s Robot::Stay at button %d (index:%d order:%d)\n", 
+			if (debug) printf("%s Robot::Stay at button %d (index:%d order:%d)\n", 
 				name, current_button, current_index, target_buttons[current_index].order);
 			return target_buttons[current_index].order;
 		}
@@ -77,31 +79,18 @@ private:
 	char *name;
 };
 
-//enum ERobotColours {eBlue, eOrange, eLast};
-//ERobotColours get_robot(char type)
-//{
-//	if (type == 'O') return eOrange;
-//	else if (type == 'B') return eBlue;
-//	else printf("Cant find robot type:%c\n", type);
-//}
 int get_robot(char type, bool first = false)
 {
 	static char first_type;
 	if (first || type == first_type)
 	{
-		//printf("type:%c (%c), return:0\n", type, first_type);
 		first_type = type;
 		return 0;
 	}
 	else
 	{
-		//printf("type:%c (%c), return:1\n", type, first_type);
 		return 1;
 	}
-
-	//if (type == 'O') return 0;
-	//else if (type == 'B') return 1;
-	//else printf("Cant find robot type:%c\n", type);
 }
 
 int main(void)
@@ -116,7 +105,7 @@ int main(void)
 	for (int test=0; test<number_of_test_cases; test++)
 	{
 		scanf("%d ", &number_of_buttons);
-		//printf("main:test->%d, number_of_buttons:%d\n", test, number_of_buttons);
+		if (debug) printf("*** Load->test:%d, number_of_buttons:%d\n", test, number_of_buttons);
 		
 		for (int button=0; button<number_of_buttons; button++)
 		{
@@ -129,11 +118,11 @@ int main(void)
 				Robots[get_robot('B')].Name("Blue");
 			}
 
-			//printf("main:robot->%c button_to_press:%d\n", robot_char, button_to_press);
+			if (debug) printf("set robot->%c button_to_press:%d\n", robot_char, button_to_press);
 			Robots[get_robot(robot_char)].Push(button_to_press, button);
 		}
 		
-
+		if (debug) printf("*** Start...\n");
 		int time=0;
 		bool waiting0 = false;
 		bool waiting1 = false;
@@ -144,7 +133,7 @@ int main(void)
 		{
 			time++;
 
-			printf("*** Time:%d\n", time);
+			if (debug) printf("Time:%d\n", time);
 			ready0 = Robots[0].Move();
 			ready1 = Robots[1].Move();
 			
@@ -163,7 +152,7 @@ int main(void)
 				order++;
 				inc=false;
 			}
-			printf("%d, %d %d, %d %d\n", order, ready0, ready1, waiting0, waiting1);
+			if (debug) printf("%d, %d %d, %d %d\n", order, ready0, ready1, waiting0, waiting1);
 		}
 
 		printf("Case #%d: %d\n", test+1, time);
